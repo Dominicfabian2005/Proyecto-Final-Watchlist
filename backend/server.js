@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+const dns = require("dns");
+dns.setServers(["1.1.1.1"]);
+
 const mongoose = require('mongoose');
 
 console.log(process.env.MONGODB_URI);
