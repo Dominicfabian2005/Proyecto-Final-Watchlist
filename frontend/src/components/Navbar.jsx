@@ -2,17 +2,15 @@ import navbarStyles from "../styles/Navbar.styles";
 
 const NAV_LINKS = ["Inicio", "Categorías", "Reviews"];
 
-export default function Navbar({ input, setInput, onAdd }) {
+export default function Navbar({ input, setInput, onSearch }) {
   return (
     <>
       <style>{navbarStyles}</style>
       <nav className="mv-nav">
-
         <div className="mv-logo">
           <div className="mv-logo-icon">M</div>
           MOVYRA
         </div>
-
         <ul className="mv-nav-links">
           {NAV_LINKS.map((label, i) => (
             <li key={label}>
@@ -22,7 +20,6 @@ export default function Navbar({ input, setInput, onAdd }) {
             </li>
           ))}
         </ul>
-
         <div className="mv-nav-search">
           <span className="mv-nav-search-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -34,14 +31,15 @@ export default function Navbar({ input, setInput, onAdd }) {
           </span>
           <input
             type="text"
-            placeholder="Agregar película…"
+            placeholder="Buscar película…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onAdd()}
+            onKeyDown={(e) => e.key === "Enter" && onSearch()}
           />
-          
+          <button className="mv-nav-search-btn" onClick={onSearch}>
+            Buscar
+          </button>
         </div>
-
       </nav>
     </>
   );
