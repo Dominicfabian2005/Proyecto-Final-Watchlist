@@ -33,7 +33,7 @@ export default function Navbar({ input, setInput, onSearch, categoria, setCatego
       {/* Modal confirmar salir */}
       {showConfirm && (
         <div style={{
-          position: "fixed", inset: 0, zIndex: 999,
+          position: "fixed", inset: 0, zIndex: 9999,
           background: "rgba(0,0,0,0.75)",
           display: "flex", alignItems: "center", justifyContent: "center"
         }}>
@@ -72,16 +72,13 @@ export default function Navbar({ input, setInput, onSearch, categoria, setCatego
       )}
 
       <nav className="mv-nav">
-        {/* Logo + botón salir */}
         <div className="mv-logo">
           <div className="mv-logo-icon">
             <img src="/si.png" alt="Movyra" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
           </div>
           MOVYRA
-          <button
-            onClick={() => setShowConfirm(true)}
-            className="mv-logout-btn"
-          >
+          {/* Solo visible en desktop */}
+          <button className="mv-logout-btn mv-logout-desktop" onClick={() => setShowConfirm(true)}>
             Salir
           </button>
         </div>
@@ -169,6 +166,7 @@ export default function Navbar({ input, setInput, onSearch, categoria, setCatego
             Buscar
           </button>
         </div>
+        {/* Solo visible en móvil */}
         <button className="mv-logout-btn" onClick={() => { setMenuOpen(false); setShowConfirm(true); }}>
           Salir
         </button>
