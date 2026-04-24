@@ -1,8 +1,15 @@
+import { useState } from "react";
 import navbarStyles from "../styles/Navbar.styles";
 
 const NAV_LINKS = ["Inicio", "Categorías", "Reviews"];
+const CATEGORIAS = [
+  "Acción", "Drama", "Romance", "Comedia",
+  "Terror", "Suspenso", "Animación", "Ciencia Ficción"
+];
 
 export default function Navbar({ input, setInput, onSearch }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
   return (
     <>
       <style>{navbarStyles}</style>
@@ -13,15 +20,36 @@ export default function Navbar({ input, setInput, onSearch }) {
           </div>
           MOVYRA
         </div>
+
         <ul className="mv-nav-links">
           {NAV_LINKS.map((label, i) => (
-            <li key={label}>
-              <button className={`mv-nav-btn ${i === 0 ? "active" : ""}`}>
+            <li key={label} style={{ position: "relative" }}>
+              <button
+                className={`mv-nav-btn ${i === 0 ? "active" : ""}`}
+                onClick={() => label === "Categorías" && setDropdownOpen(!dropdownOpen)}
+              >
                 {label}
               </button>
+
+              {/* Dropdown solo para Categorías */}
+              {label === "Categorías" && dropdownOpen && (
+                <ul className="mv-dropdown">
+                  {CATEGORIAS.map((cat) => (
+                    <li key={cat}>
+                      <button
+                        className="mv-dropdown-item"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        {cat}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
+
         <div className="mv-nav-search">
           <span className="mv-nav-search-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -38,9 +66,7 @@ export default function Navbar({ input, setInput, onSearch }) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onSearch()}
           />
-          <button className="mv-nav-search-btn" onClick={onSearch}>
-            Buscar
-          </button>
+          <button className="mv-nav-search-btn" onClick={onSearch}>Buscar</button>
         </div>
       </nav>
     </>
