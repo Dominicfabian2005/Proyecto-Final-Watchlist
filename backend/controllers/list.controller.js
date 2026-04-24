@@ -17,7 +17,8 @@ exports.obtenerLista = async (req, res) => {
  
 exports.agregarPelicula = async (req, res) => {
   try {
-    const { tmdbId, title, year, rating, poster } = req.body;
+    const { tmdbId, title, year, rating, poster, genres } = req.body;
+console.log("GENRES RECIBIDOS:", JSON.stringify(genres)); // ← agrega esto
  
     // El título es lo único realmente obligatorio
     if (!title) {
@@ -40,7 +41,7 @@ exports.agregarPelicula = async (req, res) => {
     const usuario = await User.findById(req.user._id);
  
     // Agregamos la película al inicio de la lista (la más reciente primero)
-    usuario.watchlist.unshift({ tmdbId, title, year, rating, poster });
+    usuario.watchlist.unshift({ tmdbId, title, year, rating, poster, genres });
     await usuario.save();
  
     res.status(201).json({

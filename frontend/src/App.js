@@ -15,6 +15,7 @@ export default function App() {
 
   const [movies,        setMovies]        = useState([]);
   const [filter,        setFilter]        = useState("all");
+  const [categoria,     setCategoria]     = useState(null);
   const [input,         setInput]         = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults,   setShowResults]   = useState(false);
@@ -37,16 +38,20 @@ export default function App() {
     try {
       const res  = await fetch(`${API}/api/movies/search?query=${input}`);
       const data = await res.json();
-      setSearchResults(data);
+      setSearchResults(Array.isArray(data) ? data : []);
       setShowResults(true);
     } catch (err) {
       console.error("Error buscando:", err);
+      setSearchResults([]);
+      setShowResults(true);
     }
   };
 
   const addFromSearch = async (movie) => {
-    const token = localStorage.getItem("token");
+  console.log("MOVIE COMPLETA:", JSON.stringify(movie)); // ← agrega esto
+  const token = localStorage.getItem("token");
     try {
+      
       const res  = await fetch(`${API}/api/list`, {
         method:  "POST",
         headers: {
@@ -61,6 +66,8 @@ export default function App() {
           poster: movie.poster_path
                     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                     : null,
+          // ✅ Así debe quedar
+genres: movie.genres || [],
         }),
       });
       const data = await res.json();
@@ -111,10 +118,17 @@ export default function App() {
     );
   };
 
-  const filtered =
-    filter === "seen"    ? movies.filter((m) =>  m.seen) :
-    filter === "pending" ? movies.filter((m) => !m.seen) :
-    movies;
+  const filtered = movies.filter((m) => {
+    // Filtro por estado (seen/pending)
+    if (filter === "seen" && !m.seen) return false;
+    if (filter === "pending" && m.seen) return false;
+    // Filtro por categoría
+    if (categoria && m.genres) {
+      const tieneCategoria = m.genres.some(g => g.name === categoria);
+      if (!tieneCategoria) return false;
+    }
+    return true;
+  });
 
   const stats = {
     total:   movies.length,
@@ -149,6 +163,11 @@ export default function App() {
       </>
     );
   }
+  const handleLogout = () => {
+  localStorage.removeItem("token");
+  setMovies([]);
+  setView("login");
+};
 
   return (
     <>
@@ -158,6 +177,9 @@ export default function App() {
           input={input}
           setInput={setInput}
           onSearch={searchMovies}
+          categoria={categoria}
+          setCategoria={setCategoria}
+          onLogout={handleLogout}
         />
         <Hero stats={stats} />
         <SearchBar filter={filter} setFilter={setFilter} />

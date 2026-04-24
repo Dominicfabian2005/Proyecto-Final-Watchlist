@@ -34,17 +34,18 @@ const usuarioSchema = new mongoose.Schema(
     },
  
     // Lista de películas del usuario (guardada dentro del mismo documento)
-    watchlist: [
-      {
-        tmdbId:   { type: Number },                        // ID de la película en TMDB (opcional)
-        title:    { type: String, required: true },        // Título de la película
-        year:     { type: String },                        // Año de estreno
-        rating:   { type: String },                        // Calificación
-        poster:   { type: String },                        // URL del poster
-        seen:     { type: Boolean, default: false },       // ¿Ya la vio?
-        addedAt:  { type: Date,    default: Date.now },    // Cuándo la agregó
-      },
-    ],
+   watchlist: [
+  {
+    tmdbId:  { type: Number },
+    title:   { type: String, required: true },
+    year:    { type: String },
+    rating:  { type: String },
+    poster:  { type: String },
+    seen:    { type: Boolean, default: false },
+    addedAt: { type: Date,    default: Date.now },
+    genres:  { type: Array, default: [] },  // ← así
+  },
+],
   },
   {
     timestamps: true, // agrega automáticamente createdAt y updatedAt

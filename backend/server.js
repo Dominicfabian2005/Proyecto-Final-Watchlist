@@ -9,7 +9,7 @@ const cors       = require("cors");
 
 const authRoutes   = require("./routes/auth.routes");
 const listRoutes   = require("./routes/list.routes");
-const moviesRoutes = require("./routes/movie");  // ← nombre del archivo de tu compañera
+const moviesRoutes = require("./routes/movies");
 
 const app = express();
 

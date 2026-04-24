@@ -117,6 +117,17 @@ const navbarStyles = `
   color: white;
   cursor: pointer;
   text-align: left;
+  transition: background 0.2s;
+}
+
+.mv-dropdown-item:hover {
+  background: rgba(168,85,247,0.2);
+}
+
+.mv-dropdown-item.active {
+  background: rgba(168,85,247,0.3);
+  color: #c084fc;
+  font-weight: 600;
 }
 
 .mv-dropdown-item:hover {

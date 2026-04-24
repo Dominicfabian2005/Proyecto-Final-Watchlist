@@ -1,6 +1,6 @@
 const express            = require("express");
 const router             = express.Router();
-const { obtenerGeneros } = require("../utils/generos");
+const { obtenerGeneros } = require("../utils/Generos");
 
 // Búsqueda de películas — GET /api/movies/search?query=inception
 router.get("/search", async (req, res) => {
@@ -34,6 +34,7 @@ router.get("/search", async (req, res) => {
     res.status(500).json({ mensaje: "No se pudo realizar la búsqueda" });
   }
 });
+
 
 // Lista de géneros — GET /api/movies/generos
 router.get("/generos", (req, res) => {
