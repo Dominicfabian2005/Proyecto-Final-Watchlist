@@ -58,30 +58,34 @@ const searchBarStyles = `
   }
 
   .mv-filter-btn {
-    padding: 7px 18px; border-radius: 20px;
-    font-size: 0.8rem; font-weight: 600;
+    padding: 9px 22px; border-radius: 20px;
+    font-size: 0.85rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
     font-family: 'Outfit', sans-serif;
-    border: 1px solid rgba(168,85,247,0.18);
-    background: rgba(20,12,36,0.6);
-    color: var(--muted);
+    border: 1.5px solid rgba(168,85,247,0.35); /* más visible */
+    background: rgba(255,255,255,0.04);        /* fondo sutil */
+    color: rgba(255,255,255,0.7);              /* texto más claro */
+    letter-spacing: 0.02em;
   }
 
   .mv-filter-btn:hover {
-    color: var(--text);
-    border-color: rgba(168,85,247,0.35);
-    background: rgba(168,85,247,0.08);
+    color: #fff;
+    border-color: rgba(168,85,247,0.6);
+    background: rgba(168,85,247,0.12);
+    transform: translateY(-1px);
   }
 
   .mv-filter-btn.active {
     background: var(--gradient);
     border-color: transparent;
     color: #fff;
-    box-shadow: 0 4px 14px rgba(168,85,247,0.35);
+    box-shadow: 0 4px 14px rgba(168,85,247,0.45);
+    transform: translateY(-1px);
   }
 
   @media (max-width: 700px) {
     .mv-search-wrap { padding-left: 20px; padding-right: 20px; }
+    .mv-filter-btn  { padding: 8px 16px; font-size: 0.8rem; }
   }
 `;
 

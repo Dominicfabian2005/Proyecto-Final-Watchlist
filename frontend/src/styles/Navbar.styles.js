@@ -96,6 +96,32 @@ const navbarStyles = `
     .mv-nav-links { display: none; }
     .mv-nav-search { width: auto; flex: 1; margin-left: 16px; }
   }
+    .mv-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 8px;
+  list-style: none;
+  padding: 8px 0;
+  z-index: 999;
+  min-width: 150px;
+}
+
+.mv-dropdown-item {
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mv-dropdown-item:hover {
+  background: #ffffff20;
+}
 `;
 
 export default navbarStyles; 
