@@ -8,22 +8,30 @@ import SearchBar from "./components/SearchBar";
 import MovieGrid from "./components/MovieGrid";
 import SearchResults from "./components/SearchResults";
 
-const COLORS = ["#1a0d2e", "#2a0d28", "#1a0a2a", "#200d30", "#150a20", "#1e0a1e"];
-const rand   = (arr) => arr[Math.floor(Math.random() * arr.length)];
-
 const API = "http://localhost:30000";
 
 export default function App() {
   const [view, setView] = useState("login");
 
-  const [movies, setMovies] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("movyra") || "[]"); }
-    catch { return []; }
-  });
+  const [movies,        setMovies]        = useState([]);
   const [filter,        setFilter]        = useState("all");
   const [input,         setInput]         = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults,   setShowResults]   = useState(false);
+
+  // ✅ Al entrar a la app, cargamos la lista real desde el backend
+  const cargarLista = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res  = await fetch(`${API}/api/list`, {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setMovies(data.watchlist || []);
+    } catch (err) {
+      console.error("Error cargando lista:", err);
+    }
+  };
 
   // Buscar en TMDB
   const searchMovies = async () => {
@@ -38,26 +46,29 @@ export default function App() {
     }
   };
 
-  // Agregar desde resultados de TMDB
+  // ✅ Agregar desde resultados de TMDB — con token y endpoint correcto
   const addFromSearch = async (movie) => {
-    const newMovie = {
-      title:  movie.title,
-      year:   movie.release_date?.slice(0, 4) || "----",
-      rating: movie.vote_average?.toFixed(1)  || "0.0",
-      poster: movie.poster_path
-                ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                : null,
-      seen:   false,
-      color:  rand(COLORS),
-    };
+    const token = localStorage.getItem("token");
     try {
-      const res   = await fetch(`${API}/api/movies`, {
+      const res  = await fetch(`${API}/api/list`, {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(newMovie),
+        headers: {
+          "Content-Type":  "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          tmdbId: movie.id,
+          title:  movie.title,
+          year:   movie.release_date?.slice(0, 4) || "----",
+          rating: movie.vote_average?.toFixed(1)  || "0.0",
+          poster: movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                    : null,
+        }),
       });
-      const saved = await res.json();
-      setMovies((prev) => [saved, ...prev]);
+      const data = await res.json();
+      if (!res.ok) { console.error(data.mensaje); return; }
+      setMovies((prev) => [data.pelicula, ...prev]);
     } catch (err) {
       console.error("Error agregando:", err);
     }
@@ -65,8 +76,38 @@ export default function App() {
     setInput("");
   };
 
-  const toggleSeen  = (id) => setMovies((prev) => prev.map((m) => m._id === id ? { ...m, seen: !m.seen } : m));
-  const removeMovie = (id) => setMovies((prev) => prev.filter((m) => m._id !== id));
+  // ✅ Toggle visto/pendiente — con token y endpoint correcto
+  const toggleSeen = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res  = await fetch(`${API}/api/list/${id}/toggle`, {
+        method:  "PATCH",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+      setMovies((prev) =>
+        prev.map((m) => m._id === id ? data.pelicula : m)
+      );
+    } catch (err) {
+      console.error("Error actualizando estado:", err);
+    }
+  };
+
+  // ✅ Eliminar película — con token y endpoint correcto
+  const removeMovie = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API}/api/list/${id}`, {
+        method:  "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      setMovies((prev) => prev.filter((m) => m._id !== id));
+    } catch (err) {
+      console.error("Error eliminando:", err);
+    }
+  };
 
   const filtered =
     filter === "seen"    ? movies.filter((m) =>  m.seen) :
@@ -86,7 +127,7 @@ export default function App() {
         <div className="auth-page">
           <Login
             onGoToRegister={() => setView("register")}
-            onLoginSuccess={() => setView("app")}
+            onLoginSuccess={() => { setView("app"); cargarLista(); }}
           />
         </div>
       </>
@@ -100,7 +141,7 @@ export default function App() {
         <div className="auth-page">
           <Register
             onGoToLogin={() => setView("login")}
-            onRegisterSuccess={() => setView("app")}
+            onRegisterSuccess={() => { setView("app"); cargarLista(); }}
           />
         </div>
       </>
@@ -133,4 +174,4 @@ export default function App() {
       </div>
     </>
   );
-}
+} 

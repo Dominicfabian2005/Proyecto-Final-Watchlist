@@ -8,7 +8,9 @@ export default function Navbar({ input, setInput, onSearch }) {
       <style>{navbarStyles}</style>
       <nav className="mv-nav">
         <div className="mv-logo">
-          <div className="mv-logo-icon">M</div>
+          <div className="mv-logo-icon">
+            <img src="/si.png" alt="Movyra" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          </div>
           MOVYRA
         </div>
         <ul className="mv-nav-links">

@@ -1,17 +1,16 @@
 const express = require("express");
-const router = express.Router();
-const listController = require("../controllers/list.controller");
-const axios = require("axios");
+const router  = express.Router();
+const axios   = require("axios");
 
-// Búsqueda en TMDB
+// ✅ Solo búsqueda en TMDB — las rutas de lista van en list.routes.js
 router.get("/search", async (req, res) => {
   try {
     const { query } = req.query;
-    const response = await axios.get(
+    const response  = await axios.get(
       `https://api.themoviedb.org/3/search/movie`,
       {
         params: {
-          api_key: process.env.TMDB_API_KEY,
+          api_key:  process.env.TMDB_API_KEY,
           query,
           language: "es-ES",
         },
@@ -23,10 +22,4 @@ router.get("/search", async (req, res) => {
   }
 });
 
-// Rutas de la lista
-router.get("/",                      listController.obtenerLista);
-router.post("/",                     listController.agregarPelicula);
-router.patch("/:movieId/toggle",     listController.cambiarEstado);
-router.delete("/:movieId",           listController.eliminarPelicula);
-
-module.exports = router;
+module.exports = router; 
