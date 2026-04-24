@@ -1,7 +1,11 @@
+import { useState } from "react";
 import movieCardStyles from "../styles/MovieCard.styles";
 
-export default function MovieCard({ movie, index, onToggle, onRemove }) {
-  const { _id, title, year, rating, seen, color, emoji, poster } = movie;
+export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) {
+  const { _id, title, year, rating, seen, color, emoji, poster, userRating, liked } = movie;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showRating, setShowRating] = useState(false);
+  const [hovered, setHovered] = useState(0);
 
   return (
     <>
@@ -9,11 +13,8 @@ export default function MovieCard({ movie, index, onToggle, onRemove }) {
       <div className="mv-card" style={{ animationDelay: `${index * 0.05}s` }}>
         <div className="mv-poster" style={{ background: color }}>
           {poster ? (
-            <img
-              src={poster}
-              alt={title}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
+            <img src={poster} alt={title}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
           ) : (
             <>
               <div className="mv-poster-emoji">{emoji || "🎬"}</div>
@@ -24,12 +25,14 @@ export default function MovieCard({ movie, index, onToggle, onRemove }) {
             {seen ? "✓ Vista" : "• Pendiente"}
           </span>
         </div>
+
         <div className="mv-card-info">
           <div className="mv-card-title" title={title}>{title}</div>
           <div className="mv-card-meta">
             <span className="mv-card-year">{year}</span>
             <span className="mv-card-rating">★ {rating}</span>
           </div>
+
           <div className="mv-card-actions">
             <button
               className="mv-btn-toggle"
@@ -42,8 +45,49 @@ export default function MovieCard({ movie, index, onToggle, onRemove }) {
             >
               {seen ? "↩ Pendiente" : "✓ Vista"}
             </button>
+
             <button className="mv-btn-remove" onClick={() => onRemove(_id)}>✕</button>
+
+            {seen && (
+              <div className="mv-menu-wrap">
+                <button className="mv-btn-menu" onClick={() => { setMenuOpen(!menuOpen); setShowRating(false); }}>
+                  ⋯
+                </button>
+                {menuOpen && (
+                  <div className="mv-menu">
+                    <button className="mv-menu-item" onClick={() => { setShowRating(true); setMenuOpen(false); }}>
+                      ⭐ Calificar
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
+          {showRating && (
+            <div className="mv-rating-box">
+              <p className="mv-rating-question">¿Te gustó?</p>
+              <div className="mv-thumbs">
+                <button className={`mv-thumb ${liked === true ? "active-like" : ""}`}
+                  onClick={() => onRate(_id, { liked: true })}>👍</button>
+                <button className={`mv-thumb ${liked === false ? "active-dislike" : ""}`}
+                  onClick={() => onRate(_id, { liked: false })}>👎</button>
+              </div>
+              <div className="mv-stars">
+                {[1,2,3,4,5].map((star) => (
+                  <button key={star} className="mv-star"
+                    onMouseEnter={() => setHovered(star)}
+                    onMouseLeave={() => setHovered(0)}
+                    onClick={() => onRate(_id, { userRating: star })}
+                    style={{ color: star <= (hovered || userRating || 0) ? "#f472b6" : "rgba(240,234,248,0.2)" }}>
+                    ★
+                  </button>
+                ))}
+              </div>
+              {userRating && <p className="mv-rating-result">Tu calificación: {userRating}/5 ⭐</p>}
+              <button className="mv-rating-close" onClick={() => setShowRating(false)}>Cerrar</button>
+            </div>
+          )}
         </div>
       </div>
     </>

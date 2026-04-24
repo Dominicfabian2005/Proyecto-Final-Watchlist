@@ -19,7 +19,6 @@ export default function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [showResults,   setShowResults]   = useState(false);
 
-  // ✅ Al entrar a la app, cargamos la lista real desde el backend
   const cargarLista = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -33,7 +32,6 @@ export default function App() {
     }
   };
 
-  // Buscar en TMDB
   const searchMovies = async () => {
     if (!input.trim()) return;
     try {
@@ -46,7 +44,6 @@ export default function App() {
     }
   };
 
-  // ✅ Agregar desde resultados de TMDB — con token y endpoint correcto
   const addFromSearch = async (movie) => {
     const token = localStorage.getItem("token");
     try {
@@ -76,7 +73,6 @@ export default function App() {
     setInput("");
   };
 
-  // ✅ Toggle visto/pendiente — con token y endpoint correcto
   const toggleSeen = async (id) => {
     const token = localStorage.getItem("token");
     try {
@@ -94,7 +90,6 @@ export default function App() {
     }
   };
 
-  // ✅ Eliminar película — con token y endpoint correcto
   const removeMovie = async (id) => {
     const token = localStorage.getItem("token");
     try {
@@ -107,6 +102,13 @@ export default function App() {
     } catch (err) {
       console.error("Error eliminando:", err);
     }
+  };
+
+  // ✅ Nueva función para calificar película
+  const rateMovie = (id, data) => {
+    setMovies((prev) =>
+      prev.map((m) => m._id === id ? { ...m, ...data } : m)
+    );
   };
 
   const filtered =
@@ -170,8 +172,9 @@ export default function App() {
           movies={filtered}
           onToggle={toggleSeen}
           onRemove={removeMovie}
+          onRate={rateMovie}
         />
       </div>
     </>
   );
-} 
+}
