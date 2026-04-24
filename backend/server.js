@@ -3,9 +3,13 @@ require('dotenv').config();
 const dns = require("dns");
 dns.setServers(["1.1.1.1"]);
 
-const express  = require("express");
-const mongoose = require("mongoose");
-const cors     = require("cors");
+const express    = require("express");
+const mongoose   = require("mongoose");
+const cors       = require("cors");
+
+const authRoutes   = require("./routes/auth.routes");
+const listRoutes   = require("./routes/list.routes");
+const moviesRoutes = require("./routes/movie");  // ← nombre del archivo de tu compañera
 
 const app = express();
 
@@ -19,9 +23,9 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch(err => console.log(err));
 
 // Rutas
-app.use("/api/auth",   require("./routes/auth.routes"));
-app.use("/api/movies", require("./routes/movies"));
-app.use("/api/list",   require("./routes/list.routes")); 
+app.use("/api/auth",   authRoutes);
+app.use("/api/list",   listRoutes);
+app.use("/api/movies", moviesRoutes);
 
 // Arrancar servidor
 app.listen(process.env.PORT, () => {
