@@ -187,6 +187,20 @@ const navbarStyles = `
     .mv-nav-search { display: none; }
     .mv-hamburger  { display: flex; }
   }
+    .mv-logout-btn {
+  background: transparent;
+  border: 1px solid rgba(168,85,247,0.3);
+  border-radius: 8px; padding: 6px 14px;
+  color: #6b5e80; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 0.85rem;
+  transition: all 0.2s;
+  margin-left: 16px;
+}
+
+.mv-logout-btn:hover {
+  color: #f0eaf8;
+  border-color: rgba(168,85,247,0.7);
+}
 `;
 
 export default navbarStyles;
