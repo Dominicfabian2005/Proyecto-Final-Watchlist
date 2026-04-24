@@ -1,7 +1,7 @@
 import movieGridStyles from "../styles/MovieGrid.styles";
 import MovieCard from "./MovieCard";
 
-export default function MovieGrid({ movies, onToggle, onRemove }) {
+export default function MovieGrid({ movies, onToggle, onRemove, onRate }) {
   return (
     <>
       <style>{movieGridStyles}</style>
@@ -15,11 +15,12 @@ export default function MovieGrid({ movies, onToggle, onRemove }) {
         <div className="mv-grid">
           {movies.map((movie, i) => (
             <MovieCard
-              key={movie.id}
+              key={movie._id}
               movie={movie}
               index={i}
               onToggle={onToggle}
               onRemove={onRemove}
+              onRate={onRate}
             />
           ))}
         </div>

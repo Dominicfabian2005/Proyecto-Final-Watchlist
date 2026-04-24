@@ -1,45 +1,27 @@
 import navbarStyles from "../styles/Navbar.styles";
 
 const NAV_LINKS = ["Inicio", "Categorías", "Reviews"];
-const CATEGORIAS = [
-  "Acción", "Drama", "Romance", "Comedia",
-  "Terror", "Suspenso", "Animación", "Ciencia Ficción"
-];
 
-export default function Navbar({ input, setInput, onAdd }) {
+export default function Navbar({ input, setInput, onSearch }) {
   return (
     <>
       <style>{navbarStyles}</style>
       <nav className="mv-nav">
-
         <div className="mv-logo">
-          <div className="mv-logo-icon">M</div>
+          <div className="mv-logo-icon">
+            <img src="/si.png" alt="Movyra" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+          </div>
           MOVYRA
         </div>
-
         <ul className="mv-nav-links">
           {NAV_LINKS.map((label, i) => (
-            <li key={label} className="mv-nav-item">
-              {label === "Categorías" ? (
-                <div className="mv-dropdown">
-                  <button className="mv-nav-btn">Categorías ▾</button>
-                  <ul className="mv-dropdown-menu">
-                    {CATEGORIAS.map((cat) => (
-                      <li key={cat}>
-                        <button className="mv-dropdown-item">{cat}</button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <button className={`mv-nav-btn ${i === 0 ? "active" : ""}`}>
-                  {label}
-                </button>
-              )}
+            <li key={label}>
+              <button className={`mv-nav-btn ${i === 0 ? "active" : ""}`}>
+                {label}
+              </button>
             </li>
           ))}
         </ul>
-
         <div className="mv-nav-search">
           <span className="mv-nav-search-icon">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -51,13 +33,15 @@ export default function Navbar({ input, setInput, onAdd }) {
           </span>
           <input
             type="text"
-            placeholder="Agregar película…"
+            placeholder="Buscar película…"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onAdd()}
+            onKeyDown={(e) => e.key === "Enter" && onSearch()}
           />
+          <button className="mv-nav-search-btn" onClick={onSearch}>
+            Buscar
+          </button>
         </div>
-
       </nav>
     </>
   );

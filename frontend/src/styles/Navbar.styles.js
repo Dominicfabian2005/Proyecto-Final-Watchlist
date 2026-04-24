@@ -18,14 +18,12 @@ const navbarStyles = `
 
   .mv-logo-icon {
     width: 34px; height: 34px;
-    background: var(--gradient);
+    background: none;
     border-radius: 8px;
     display: grid; place-items: center;
-    font-size: 0.8rem; font-weight: 900; color: #fff;
-    box-shadow: 0 0 18px rgba(168,85,247,0.45);
+    box-shadow: none;
   }
 
-  /* links centrados con position absolute */
   .mv-nav-links {
     position: absolute; left: 50%; transform: translateX(-50%);
     display: flex; gap: 4px;
@@ -43,7 +41,6 @@ const navbarStyles = `
   .mv-nav-btn:hover  { color: var(--text); background: rgba(168,85,247,0.1); }
   .mv-nav-btn.active { color: var(--purple-l); background: rgba(168,85,247,0.12); }
 
-  /* search al final con margin-left auto */
   .mv-nav-search {
     margin-left: auto;
     display: flex; align-items: center;
@@ -136,5 +133,9 @@ const navbarStyles = `
   }
 `;
 
+<<<<<<< HEAD
 export default navbarStyles;
 
+=======
+export default navbarStyles; 
+>>>>>>> dev

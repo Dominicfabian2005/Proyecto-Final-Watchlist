@@ -1,43 +1,115 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import appStyles from "./styles/App.styles";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import SearchBar from "./components/SearchBar";
 import MovieGrid from "./components/MovieGrid";
-import appStyles from "./styles/App.styles";
+import SearchResults from "./components/SearchResults";
 
-const EMOJIS = ["🎬", "🎥", "🍿", "🎞️", "🎦", "📽️"];
-const COLORS  = ["#1a0d2e", "#2a0d28", "#1a0a2a", "#200d30", "#150a20", "#1e0a1e"];
-const rand    = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const API = "http://localhost:30000";
 
 export default function App() {
-  const [movies, setMovies] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("movyra") || "[]"); }
-    catch { return []; }
-  });
-  const [filter, setFilter] = useState("all");
-  const [input,  setInput]  = useState("");
+  const [view, setView] = useState("login");
 
-  useEffect(() => {
-    localStorage.setItem("movyra", JSON.stringify(movies));
-  }, [movies]);
+  const [movies,        setMovies]        = useState([]);
+  const [filter,        setFilter]        = useState("all");
+  const [input,         setInput]         = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults,   setShowResults]   = useState(false);
 
-  const addMovie = () => {
-    const title = input.trim();
-    if (!title) return;
-    setMovies((prev) => [{
-      id:     Date.now(),
-      title,
-      year:   String(2010 + Math.floor(Math.random() * 15)),
-      rating: (6.5 + Math.random() * 3).toFixed(1),
-      seen:   false,
-      color:  rand(COLORS),
-      emoji:  rand(EMOJIS),
-    }, ...prev]);
+  const cargarLista = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res  = await fetch(`${API}/api/list`, {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setMovies(data.watchlist || []);
+    } catch (err) {
+      console.error("Error cargando lista:", err);
+    }
+  };
+
+  const searchMovies = async () => {
+    if (!input.trim()) return;
+    try {
+      const res  = await fetch(`${API}/api/movies/search?query=${input}`);
+      const data = await res.json();
+      setSearchResults(data);
+      setShowResults(true);
+    } catch (err) {
+      console.error("Error buscando:", err);
+    }
+  };
+
+  const addFromSearch = async (movie) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res  = await fetch(`${API}/api/list`, {
+        method:  "POST",
+        headers: {
+          "Content-Type":  "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          tmdbId: movie.id,
+          title:  movie.title,
+          year:   movie.release_date?.slice(0, 4) || "----",
+          rating: movie.vote_average?.toFixed(1)  || "0.0",
+          poster: movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                    : null,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) { console.error(data.mensaje); return; }
+      setMovies((prev) => [data.pelicula, ...prev]);
+    } catch (err) {
+      console.error("Error agregando:", err);
+    }
+    setShowResults(false);
     setInput("");
   };
 
-  const toggleSeen  = (id) => setMovies((prev) => prev.map((m) => m.id === id ? { ...m, seen: !m.seen } : m));
-  const removeMovie = (id) => setMovies((prev) => prev.filter((m) => m.id !== id));
+  const toggleSeen = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res  = await fetch(`${API}/api/list/${id}/toggle`, {
+        method:  "PATCH",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+      setMovies((prev) =>
+        prev.map((m) => m._id === id ? data.pelicula : m)
+      );
+    } catch (err) {
+      console.error("Error actualizando estado:", err);
+    }
+  };
+
+  const removeMovie = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API}/api/list/${id}`, {
+        method:  "DELETE",
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      setMovies((prev) => prev.filter((m) => m._id !== id));
+    } catch (err) {
+      console.error("Error eliminando:", err);
+    }
+  };
+
+  // ✅ Nueva función para calificar película
+  const rateMovie = (id, data) => {
+    setMovies((prev) =>
+      prev.map((m) => m._id === id ? { ...m, ...data } : m)
+    );
+  };
 
   const filtered =
     filter === "seen"    ? movies.filter((m) =>  m.seen) :
@@ -50,17 +122,57 @@ export default function App() {
     pending: movies.filter((m) => !m.seen).length,
   };
 
+  if (view === "login") {
+    return (
+      <>
+        <style>{appStyles}</style>
+        <div className="auth-page">
+          <Login
+            onGoToRegister={() => setView("register")}
+            onLoginSuccess={() => { setView("app"); cargarLista(); }}
+          />
+        </div>
+      </>
+    );
+  }
+
+  if (view === "register") {
+    return (
+      <>
+        <style>{appStyles}</style>
+        <div className="auth-page">
+          <Register
+            onGoToLogin={() => setView("login")}
+            onRegisterSuccess={() => { setView("app"); cargarLista(); }}
+          />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <style>{appStyles}</style>
       <div className="movyra-wrap">
-        <Navbar input={input} setInput={setInput} onAdd={addMovie} />
+        <Navbar
+          input={input}
+          setInput={setInput}
+          onSearch={searchMovies}
+        />
         <Hero stats={stats} />
         <SearchBar filter={filter} setFilter={setFilter} />
+        {showResults && (
+          <SearchResults
+            results={searchResults}
+            onAdd={addFromSearch}
+            onClose={() => setShowResults(false)}
+          />
+        )}
         <MovieGrid
           movies={filtered}
           onToggle={toggleSeen}
           onRemove={removeMovie}
+          onRate={rateMovie}
         />
       </div>
     </>
