@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import navbarStyles from "../styles/Navbar.styles";
 
 const NAV_LINKS = ["Inicio", "Categorías", "Reviews"];
@@ -9,6 +9,18 @@ const CATEGORIAS = [
 
 export default function Navbar({ input, setInput, onSearch }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Cierra el dropdown al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -23,23 +35,23 @@ export default function Navbar({ input, setInput, onSearch }) {
 
         <ul className="mv-nav-links">
           {NAV_LINKS.map((label, i) => (
-            <li key={label} style={{ position: "relative" }}>
+            <li key={label} style={{ position: "relative" }} ref={label === "Categorías" ? dropdownRef : null}>
               <button
-                className={`mv-nav-btn ${i === 0 ? "active" : ""}`}
+                className={`mv-nav-btn ${i === 0 ? "active" : ""} ${label === "Categorías" && dropdownOpen ? "active" : ""}`}
                 onClick={() => label === "Categorías" && setDropdownOpen(!dropdownOpen)}
               >
-                {label}
+                {label === "Categorías" ? (
+                  <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    Categorías <span style={{ fontSize: "0.65rem" }}>{dropdownOpen ? "▲" : "▼"}</span>
+                  </span>
+                ) : label}
               </button>
 
-              {/* Dropdown solo para Categorías */}
               {label === "Categorías" && dropdownOpen && (
                 <ul className="mv-dropdown">
                   {CATEGORIAS.map((cat) => (
                     <li key={cat}>
-                      <button
-                        className="mv-dropdown-item"
-                        onClick={() => setDropdownOpen(false)}
-                      >
+                      <button className="mv-dropdown-item" onClick={() => setDropdownOpen(false)}>
                         {cat}
                       </button>
                     </li>
