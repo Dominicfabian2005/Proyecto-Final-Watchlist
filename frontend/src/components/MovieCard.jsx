@@ -2,10 +2,12 @@ import { useState } from "react";
 import movieCardStyles from "../styles/MovieCard.styles";
 
 export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) {
+  const [commentSaved, setCommentSaved] = useState(false);
   const { _id, title, year, rating, seen, color, emoji, poster, userRating, liked } = movie;
   const [menuOpen, setMenuOpen] = useState(false);
   const [showRating, setShowRating] = useState(false);
   const [hovered, setHovered] = useState(0);
+  const [comment, setComment] = useState(movie.comment || "");
 
   return (
     <>
@@ -84,7 +86,30 @@ export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) 
                   </button>
                 ))}
               </div>
-              {userRating && <p className="mv-rating-result">Tu calificación: {userRating}/5 ⭐</p>}
+
+              <div className="mv-comment-section">
+                <textarea
+              className="mv-comment-input"
+              placeholder="Deja tu comentario aquí..."
+              value={comment}
+            onChange={(e) => setComment(e.target.value)}
+              rows={3}
+            />
+          {commentSaved && (
+        <p className="mv-comment-saved">¡Comentario guardado! ✓</p>
+      )}
+          <button
+        className="mv-comment-save"
+        onClick={() => {
+      onRate(_id, { comment });
+      setCommentSaved(true);
+         setTimeout(() => setCommentSaved(false), 3000);
+      }}
+    >
+      Guardar comentario
+         </button>
+      </div>
+
               <button className="mv-rating-close" onClick={() => setShowRating(false)}>Cerrar</button>
             </div>
           )}

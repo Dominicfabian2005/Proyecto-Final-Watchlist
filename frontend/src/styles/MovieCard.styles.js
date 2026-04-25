@@ -157,6 +157,51 @@ const movieCardStyles = `
   }
 
   .mv-rating-close:hover { opacity: 0.7; }
+  .mv-comment-section {
+    margin-top: 12px; text-align: left;
+  }
+
+  .mv-comment-label {
+    font-size: 0.8rem; color: var(--text);
+    font-weight: 600; margin-bottom: 6px;
+  }
+
+  .mv-comment-input {
+    width: 100%; border-radius: 8px;
+    background: rgba(20,12,36,0.9);
+    border: 1px solid rgba(168,85,247,0.2);
+    color: var(--text); padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.78rem; resize: none;
+    outline: none; box-sizing: border-box;
+    transition: border-color 0.2s;
+  }
+
+  .mv-comment-input:focus {
+    border-color: rgba(168,85,247,0.5);
+  }
+
+  .mv-comment-input::placeholder { color: var(--muted); }
+
+  .mv-comment-save {
+    margin-top: 6px; width: 100%;
+    padding: 6px; border-radius: 7px;
+    background: rgba(168,85,247,0.15);
+    border: 1px solid rgba(168,85,247,0.3);
+    color: #c084fc; font-size: 0.75rem;
+    font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .mv-comment-save:hover { opacity: 0.75; }
+
+  .mv-comment-saved {
+    font-size: 0.78rem; color: #a78bfa;
+    font-weight: 600; margin: 6px 0;
+    text-align: center;
+    animation: mvFadeUp 0.3s both;
+  }
 `;
 
 export default movieCardStyles;
