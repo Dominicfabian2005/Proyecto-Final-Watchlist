@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import navbarStyles from "../styles/Navbar.styles";
+import { BarChart2 } from "lucide-react";
 
 const NAV_LINKS = ["Inicio", "Categorías"];
 const CATEGORIAS = [
@@ -10,7 +11,7 @@ const CATEGORIAS = [
   "Suspenso", "Bélica", "Western"
 ];
 
-export default function Navbar({ input, setInput, onSearch, categoria, setCategoria, onLogout }) {
+export default function Navbar({ input, setInput, onSearch, categoria, setCategoria, onLogout, onDashboard }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showConfirm,  setShowConfirm]  = useState(false);
   const [menuOpen,     setMenuOpen]     = useState(false);
@@ -140,6 +141,22 @@ export default function Navbar({ input, setInput, onSearch, categoria, setCatego
             onKeyDown={(e) => e.key === "Enter" && onSearch()}
           />
           <button className="mv-nav-search-btn" onClick={onSearch}>Buscar</button>
+            {/* Botón Dashboard */}
+  <button
+    onClick={onDashboard}
+    style={{
+      background:   "rgba(155,89,182,0.2)",
+      border:       "1px solid rgba(155,89,182,0.4)",
+      borderRadius: "8px",
+      padding:      "8px 12px",
+      cursor:       "pointer",
+      marginLeft:   "8px",
+      display:      "flex",
+      alignItems:   "center",
+    }}
+  >
+    <BarChart2 size={18} color="#c084fc" />
+  </button>
         </div>
 
         {/* Hamburger móvil */}

@@ -1,14 +1,42 @@
 import { useState } from "react";
 import movieCardStyles from "../styles/MovieCard.styles";
-
+ 
+const API = "http://localhost:30000";
+ 
 export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) {
   const [commentSaved, setCommentSaved] = useState(false);
-  const { _id, title, year, rating, seen, color, emoji, poster, userRating, liked } = movie;
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [showRating, setShowRating] = useState(false);
-  const [hovered, setHovered] = useState(0);
-  const [comment, setComment] = useState(movie.comment || "");
-
+  const { _id, title, year, rating, seen, color, emoji, poster, userRating } = movie;
+  const [menuOpen,    setMenuOpen]    = useState(false);
+  const [showRating,  setShowRating]  = useState(false);
+  const [hovered,     setHovered]     = useState(0);
+  const [comment,     setComment]     = useState(movie.comment || "");
+ 
+  // Guarda el comentario y las estrellas en el backend
+  const guardarReview = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(`${API}/api/list/${_id}/review`, {
+        method:  "PATCH",
+        headers: {
+          "Content-Type":  "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          stars:   userRating || 0,
+          comment: comment,
+        }),
+      });
+ 
+      if (res.ok) {
+        onRate(_id, { comment });
+        setCommentSaved(true);
+        setTimeout(() => setCommentSaved(false), 3000);
+      }
+    } catch (err) {
+      console.error("Error guardando reseña:", err);
+    }
+  };
+ 
   return (
     <>
       <style>{movieCardStyles}</style>
@@ -27,14 +55,14 @@ export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) 
             {seen ? "✓ Vista" : "• Pendiente"}
           </span>
         </div>
-
+ 
         <div className="mv-card-info">
           <div className="mv-card-title" title={title}>{title}</div>
           <div className="mv-card-meta">
             <span className="mv-card-year">{year}</span>
             <span className="mv-card-rating">★ {rating}</span>
           </div>
-
+ 
           <div className="mv-card-actions">
             <button
               className="mv-btn-toggle"
@@ -47,17 +75,23 @@ export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) 
             >
               {seen ? "↩ Pendiente" : "✓ Vista"}
             </button>
-
+ 
             <button className="mv-btn-remove" onClick={() => onRemove(_id)}>✕</button>
-
+ 
             {seen && (
               <div className="mv-menu-wrap">
-                <button className="mv-btn-menu" onClick={() => { setMenuOpen(!menuOpen); setShowRating(false); }}>
+                <button
+                  className="mv-btn-menu"
+                  onClick={() => { setMenuOpen(!menuOpen); setShowRating(false); }}
+                >
                   ⋯
                 </button>
                 {menuOpen && (
                   <div className="mv-menu">
-                    <button className="mv-menu-item" onClick={() => { setShowRating(true); setMenuOpen(false); }}>
+                    <button
+                      className="mv-menu-item"
+                      onClick={() => { setShowRating(true); setMenuOpen(false); }}
+                    >
                       ⭐ Calificar
                     </button>
                   </div>
@@ -65,52 +99,50 @@ export default function MovieCard({ movie, index, onToggle, onRemove, onRate }) 
               </div>
             )}
           </div>
-
+ 
           {showRating && (
             <div className="mv-rating-box">
-              <p className="mv-rating-question">¿Te gustó?</p>
-              <div className="mv-thumbs">
-                <button className={`mv-thumb ${liked === true ? "active-like" : ""}`}
-                  onClick={() => onRate(_id, { liked: true })}>👍</button>
-                <button className={`mv-thumb ${liked === false ? "active-dislike" : ""}`}
-                  onClick={() => onRate(_id, { liked: false })}>👎</button>
-              </div>
+ 
+              {/* Estrellas */}
               <div className="mv-stars">
-                {[1,2,3,4,5].map((star) => (
-                  <button key={star} className="mv-star"
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    className="mv-star"
                     onMouseEnter={() => setHovered(star)}
                     onMouseLeave={() => setHovered(0)}
                     onClick={() => onRate(_id, { userRating: star })}
-                    style={{ color: star <= (hovered || userRating || 0) ? "#f472b6" : "rgba(240,234,248,0.2)" }}>
+                    style={{
+                      color: star <= (hovered || userRating || 0)
+                        ? "#f472b6"
+                        : "rgba(240,234,248,0.2)"
+                    }}
+                  >
                     ★
                   </button>
                 ))}
               </div>
-
+ 
+              {/* Comentario */}
               <div className="mv-comment-section">
                 <textarea
-              className="mv-comment-input"
-              placeholder="Deja tu comentario aquí..."
-              value={comment}
-            onChange={(e) => setComment(e.target.value)}
-              rows={3}
-            />
-          {commentSaved && (
-        <p className="mv-comment-saved">¡Comentario guardado! ✓</p>
-      )}
-          <button
-        className="mv-comment-save"
-        onClick={() => {
-      onRate(_id, { comment });
-      setCommentSaved(true);
-         setTimeout(() => setCommentSaved(false), 3000);
-      }}
-    >
-      Guardar comentario
-         </button>
-      </div>
-
-              <button className="mv-rating-close" onClick={() => setShowRating(false)}>Cerrar</button>
+                  className="mv-comment-input"
+                  placeholder="Deja tu comentario aquí..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={3}
+                />
+                {commentSaved && (
+                  <p className="mv-comment-saved">¡Comentario guardado! ✓</p>
+                )}
+                <button className="mv-comment-save" onClick={guardarReview}>
+                  Guardar comentario
+                </button>
+              </div>
+ 
+              <button className="mv-rating-close" onClick={() => setShowRating(false)}>
+                Cerrar
+              </button>
             </div>
           )}
         </div>

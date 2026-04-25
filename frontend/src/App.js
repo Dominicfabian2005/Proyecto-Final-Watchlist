@@ -7,6 +7,7 @@ import Hero from "./components/Hero";
 import SearchBar from "./components/SearchBar";
 import MovieGrid from "./components/MovieGrid";
 import SearchResults from "./components/SearchResults";
+import Dashboard from "./components/Dashboard";
 
 const API = "http://localhost:30000";
 
@@ -19,6 +20,7 @@ export default function App() {
   const [input,         setInput]         = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults,   setShowResults]   = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const cargarLista = async () => {
     const token = localStorage.getItem("token");
@@ -180,15 +182,21 @@ genres: movie.genres || [],
           categoria={categoria}
           setCategoria={setCategoria}
           onLogout={handleLogout}
+          onDashboard={() => setShowDashboard(true)}
         />
         <Hero stats={stats} />
         <SearchBar filter={filter} setFilter={setFilter} />
-        {showResults && (
+        {showDashboard && (
+       <Dashboard onClose={() => setShowDashboard(false)} />
+       )}
+
+          {showResults && (
           <SearchResults
             results={searchResults}
             onAdd={addFromSearch}
             onClose={() => setShowResults(false)}
           />
+          
         )}
         <MovieGrid
           movies={filtered}
