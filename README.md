@@ -8,4 +8,4 @@ Aplicación hecha con React consumiendo una API.
 - mongoDB Atlas
 
 ## Preview
-![Preview](public/preview.png)
+![Preview](frontend/public/preview.png)
